@@ -1,4 +1,4 @@
-#CryoSensor
+# CryoSensor
 
 A project submission for the September 2025 run of the LLM Hackathon (https://llmhackathon.github.io).
 
