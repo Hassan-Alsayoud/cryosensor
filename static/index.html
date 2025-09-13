@@ -1,0 +1,145 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Lng Assistant — UI</title>
+<style>
+  body { font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, Arial; padding: 18px; max-width: 900px; margin: 0 auto; }
+  header { display:flex; align-items:center; gap:12px; margin-bottom:18px; }
+  h1 { margin: 0; font-size:20px; }
+  .card { background:#fff; border:1px solid #eee; padding:12px; border-radius:8px; box-shadow:0 1px 2px rgba(0,0,0,0.03); margin-bottom:12px; }
+  label { display:block; font-size:13px; margin-top:8px; color:#333; }
+  input[type="text"], textarea, select { width:100%; padding:8px; border:1px solid #ddd; border-radius:6px; font-size:13px; box-sizing:border-box; }
+  textarea { min-height:120px; resize:vertical; }
+  button { padding:8px 12px; border-radius:6px; background:#0366d6; color:white; border:0; cursor:pointer; }
+  button.secondary { background:#667; opacity:0.9; }
+  pre { background:#0f1724; color:#e6eef8; padding:12px; border-radius:6px; overflow:auto; }
+  .row { display:flex; gap:8px; margin-top:8px; }
+  .small { font-size:13px; color:#666; }
+  .status { margin-top:8px; font-size:13px; color:#0b6; }
+</style>
+</head>
+<body>
+<header>
+  <h1>Lng Assistant</h1>
+  <div class="small">Talk to your RAG model & thermo helper</div>
+</header>
+
+<div class="card">
+  <strong>1) Upload PDF / Txt</strong>
+  <p class="small">Upload a document into the docs folder and reindex automatically.</p>
+  <input id="fileInput" type="file" accept=".pdf,.txt" />
+  <div class="row">
+    <button id="uploadBtn">Upload & Reindex</button>
+    <button id="reindexBtn" class="secondary">Force Reindex</button>
+  </div>
+  <div id="uploadStatus" class="small"></div>
+</div>
+
+<div class="card">
+  <strong>2) Ask a question</strong>
+  <label>Question</label>
+  <textarea id="question">Summarize the main findings in these documents.</textarea>
+
+  <label>Composition (JSON: component -> mole fraction)</label>
+  <input id="composition" value='{"methane": 0.9, "ethane": 0.1}' />
+
+  <label>Temperature (K)</label>
+  <input id="temperature" value="110" />
+
+  <label>Pressure (Pa)</label>
+  <input id="pressure" value="101325" />
+
+  <div class="row">
+    <button id="askBtn">Ask</button>
+    <button id="clearBtn" class="secondary">Clear</button>
+  </div>
+
+  <div id="askStatus" class="status" style="display:none">Working…</div>
+</div>
+
+<div class="card">
+  <strong>Response</strong>
+  <div id="responseBlock">
+    <pre id="response">No response yet.</pre>
+  </div>
+</div>
+
+<script>
+const base = ''; // served from same origin; leave blank if using same server
+const uploadBtn = document.getElementById('uploadBtn');
+const reindexBtn = document.getElementById('reindexBtn');
+const askBtn = document.getElementById('askBtn');
+const clearBtn = document.getElementById('clearBtn');
+const fileInput = document.getElementById('fileInput');
+const uploadStatus = document.getElementById('uploadStatus');
+const askStatus = document.getElementById('askStatus');
+const responseEl = document.getElementById('response');
+
+uploadBtn.onclick = async () => {
+  const f = fileInput.files[0];
+  if (!f) { uploadStatus.textContent = 'Select a file first.'; return; }
+  uploadStatus.textContent = 'Uploading…';
+  const fd = new FormData();
+  fd.append('file', f);
+  try {
+    const r = await fetch(base + '/upload', { method: 'POST', body: fd });
+    const j = await r.json();
+    if (!r.ok) { uploadStatus.textContent = 'Upload failed: ' + (j.detail || JSON.stringify(j)); return; }
+    uploadStatus.textContent = `Uploaded ${j.filename} — indexed ${j.indexed_chunks} chunks.`;
+  } catch (e) {
+    uploadStatus.textContent = 'Upload error: ' + e.message;
+  }
+};
+
+reindexBtn.onclick = async () => {
+  uploadStatus.textContent = 'Reindexing…';
+  try {
+    const r = await fetch(base + '/reindex', { method: 'POST' });
+    const j = await r.json();
+    if (!r.ok) { uploadStatus.textContent = 'Reindex failed: ' + (j.detail || JSON.stringify(j)); return; }
+    uploadStatus.textContent = `Reindex complete — ${j.indexed_chunks} chunks.`;
+  } catch (e) {
+    uploadStatus.textContent = 'Reindex error: ' + e.message;
+  }
+};
+
+askBtn.onclick = async () => {
+  askStatus.style.display = 'inline';
+  askStatus.textContent = 'Working…';
+  responseEl.textContent = '';
+  try {
+    const payload = {
+      query: document.getElementById('question').value,
+      process_data: {
+        composition: JSON.parse(document.getElementById('composition').value),
+        temperature: parseFloat(document.getElementById('temperature').value),
+        pressure: parseFloat(document.getElementById('pressure').value)
+      }
+    };
+    const r = await fetch(base + '/ask', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+    const j = await r.json();
+    if (!r.ok) {
+      responseEl.textContent = 'Error: ' + (j.detail || JSON.stringify(j));
+    } else {
+      responseEl.textContent = JSON.stringify(j, null, 2);
+    }
+  } catch (e) {
+    responseEl.textContent = 'Request failed: ' + e.message;
+  } finally {
+    askStatus.style.display = 'none';
+  }
+};
+
+clearBtn.onclick = () => {
+  document.getElementById('question').value = '';
+  responseEl.textContent = 'No response yet.';
+};
+</script>
+</body>
+</html>
