@@ -23,4 +23,5 @@ Created by:
 - Najla Albassam
 
 Many thanks to the organizing team of the LLM Hackathon (https://llmhackathon.github.io/about) for hosting an event that sparks many great ideas for LLM applications in science and industry.
+
 Special thanks to the organizing team at KFUPM for providing the facilities and a supportive environment that enabled us to focus and work effectively on our projects.
