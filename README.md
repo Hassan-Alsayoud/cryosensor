@@ -4,9 +4,9 @@ A project submission for the September 2025 run of the LLM Hackathon (https://ll
 
 This project aims to create an LLM assistant that can provide accurate information on critical chemical and physical properties of process fluids through the use of RAG.
 
-During the hackathon, this projects was focused mainly on uses by LNG plant operators; but the use cases here can easily be extended to other settings of interest.
+During the hackathon, this project was focused mainly on uses by LNG plant operators; but the use cases here can easily be extended to other settings of interest.
 
-One of the goals of this project are to give the agent access to certain scientific tools; however, the project doesn't currently do that. The thermo library is merely imported and presented on a front end in this project, without LLM integration.
+One of the goals of this project are to give the agent access to certain scientific tools; however, the project doesn't currently do that. The thermo library is merely imported and presented on a front end in the locally hosted website, without LLM integration.
 
 The application does currently take advantage of RAG to find and reference information in provided literature.
 
