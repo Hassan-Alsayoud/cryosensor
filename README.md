@@ -14,6 +14,7 @@ There needs to be a pdf document in a docs/ folder in the same directory as the 
 
 Several dependancies are needed to run the application:
 ```pip install fastapi uvicorn pydantic langchain langchain-community langchain-groq langchain-chroma langchain-huggingface thermo sentence-transformers transformers torch chromadb```
+
 You will also need a Groq platform API key to run it. The code should also be easily changeable to support other platforms (OpenAI or Ollama for example)
 
 We highly discourage deployment of this application, even for personal use. The code has been mostly AI generated and was not properly reviewed and evaluated for security, precision, and accuracy.
