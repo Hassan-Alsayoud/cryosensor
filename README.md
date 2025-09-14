@@ -6,7 +6,7 @@ This project aims to create an LLM assistant that can provide accurate informati
 
 During the hackathon, this project was focused mainly on uses by LNG plant operators; but the use cases here can easily be extended to other settings of interest.
 
-One of the goals of this project are to give the agent access to certain scientific tools; however, the project doesn't currently do that. The thermo library is merely imported and presented on a front end in the locally hosted website, without LLM integration.
+One of the goals of this project is to give the agent access to certain scientific tools; however, the project doesn't currently do that. The thermo library is merely imported and presented on a front end in the locally hosted website, without LLM integration.
 
 The application does currently take advantage of RAG to find and reference information in provided literature.
 
@@ -14,6 +14,7 @@ There needs to be a pdf document in a docs/ folder in the same directory as the 
 
 Several dependancies are needed to run the application:
 ```pip install fastapi uvicorn pydantic langchain langchain-community langchain-groq langchain-chroma langchain-huggingface thermo sentence-transformers transformers torch chromadb```
+You will also need a Groq platform API key to run it. The code should also be easily changeable to support other platforms (OpenAI or Ollama for example)
 
 We highly discourage deployment of this application, even for personal use. The code has been mostly AI generated and was not properly reviewed and evaluated for security, precision, and accuracy.
 
